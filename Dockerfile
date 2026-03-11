@@ -3,7 +3,7 @@
 FROM python:3.14-slim AS builder
 RUN pip install --no-cache-dir uv
 WORKDIR /build
-ARG APP_VERSION=0.2.0
+ARG APP_VERSION=0.2.1
 COPY pyproject.toml uv.lock ./
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
