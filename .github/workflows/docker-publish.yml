@@ -91,11 +91,11 @@ jobs:
             -u ${{ github.actor }} \
             -p ${{ secrets.GITHUB_TOKEN }}
           helm push pihole-exporter-${{ steps.version.outputs.version }}.tgz \
-            oci://${{ env.REGISTRY }}/${{ github.repository_owner }}
+            oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/helm-charts
 
       - name: Summary
         run: |
           echo "🐳 Docker image pushed: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ steps.version.outputs.version }}" != "latest" ]]; then
-            echo "⎈ Helm chart pushed: oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/pihole-exporter:${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "⎈ Helm chart pushed: oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/helm-charts/pihole-exporter:${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           fi

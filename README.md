@@ -76,7 +76,7 @@ services:
 ### Helm
 
 ```bash
-helm install pihole-exporter oci://ghcr.io/cdelgehier/pihole-exporter \
+helm install pihole-exporter oci://ghcr.io/cdelgehier/helm-charts/pihole-exporter \
   --set pihole.host=192.168.1.1 \
   --set pihole.passwordSecretRef.name=pihole-password
 ```
