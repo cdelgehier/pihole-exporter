@@ -25,6 +25,7 @@ version_files = [
     "helm/Chart.yaml:^version",
     "helm/Chart.yaml:^appVersion",
     "helm/values.yaml:tag",
+    "README.md:targetRevision",
 ]
 
 [dependency-groups]

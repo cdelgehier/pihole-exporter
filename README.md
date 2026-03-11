@@ -81,6 +81,20 @@ helm install pihole-exporter oci://ghcr.io/cdelgehier/helm-charts/pihole-exporte
   --set pihole.passwordSecretRef.name=pihole-password
 ```
 
+### ArgoCD (v3+)
+
+Use the native OCI source format with `path: .` — do not use the Helm `chart:` field:
+
+```yaml
+- repoURL: oci://ghcr.io/cdelgehier/helm-charts/pihole-exporter
+  path: .
+  targetRevision: "0.2.1"
+  helm:
+    valuesObject:
+      pihole:
+        host: "pihole-web.pihole.svc.cluster.local"
+```
+
 ## Development
 
 ```bash
