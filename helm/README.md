@@ -1,6 +1,6 @@
 # pihole-exporter
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.0](https://img.shields.io/badge/AppVersion-0.2.0-informational?style=flat-square)
 
 Prometheus exporter for Pi-hole v6
 
@@ -13,7 +13,7 @@ Prometheus exporter for Pi-hole v6
 | exporter.scrapeInterval | int | `30` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/cdelgehier/pihole-exporter"` |  |
-| image.tag | string | `"0.1.0"` |  |
+| image.tag | string | `"0.2.0"` |  |
 | pihole.host | string | `"pihole-web.pihole.svc.cluster.local"` |  |
 | pihole.https | bool | `false` |  |
 | pihole.passwordSecretRef.key | string | `"password"` |  |
