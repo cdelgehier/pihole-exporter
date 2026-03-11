@@ -1,0 +1,30 @@
+image:
+  repository: ghcr.io/cdelgehier/pihole-exporter
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+pihole:
+  host: "pihole-web.pihole.svc.cluster.local"
+  port: 80
+  https: false
+  passwordSecretRef:
+    name: pihole-password
+    key: password
+
+exporter:
+  port: 9666
+  scrapeInterval: 30
+  logLevel: INFO
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    memory: 64Mi
+
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  namespace: ""
+  labels: {}

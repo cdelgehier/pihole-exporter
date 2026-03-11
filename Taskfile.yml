@@ -1,0 +1,80 @@
+version: "3"
+
+vars:
+  SRC: pihole_exporter
+  TESTS: tests
+
+tasks:
+  default:
+    desc: List available tasks
+    cmd: task --list
+
+  # ── Dependencies ────────────────────────────────────────────────────────────
+
+  install:
+    desc: Install all dependencies (including dev)
+    cmd: uv sync --all-groups
+    sources:
+      - pyproject.toml
+      - uv.lock
+
+  # ── Linting & formatting ────────────────────────────────────────────────────
+
+  lint:
+    desc: Run ruff linter
+    cmd: uv run ruff check {{.SRC}} {{.TESTS}}
+
+  fmt:
+    desc: Format code with ruff
+    cmd: uv run ruff format {{.SRC}} {{.TESTS}}
+
+  fmt-check:
+    desc: Check formatting without modifying files
+    cmd: uv run ruff format --check {{.SRC}} {{.TESTS}}
+
+  # ── Tests ───────────────────────────────────────────────────────────────────
+
+  test:
+    desc: Run test suite with coverage
+    cmd: uv run pytest
+
+  # ── Pre-commit ──────────────────────────────────────────────────────────────
+
+  pre-commit-install:
+    desc: Install pre-commit hooks (pre-push + commit-msg)
+    cmds:
+      - pre-commit install
+      - pre-commit install --hook-type commit-msg
+
+  pre-commit:
+    desc: Run all pre-commit hooks on staged files
+    cmd: pre-commit run
+
+  pre-commit-all:
+    desc: Run all pre-commit hooks on all files
+    cmd: pre-commit run --all-files
+
+  # ── Helm ────────────────────────────────────────────────────────────────────
+
+  helm-lint:
+    desc: Lint the Helm chart
+    cmd: helm lint helm/
+
+  helm-template:
+    desc: Render Helm templates
+    cmd: helm template pihole-exporter helm/
+
+  helm-test:
+    desc: Run helm-unittest tests
+    cmd: helm unittest helm/
+
+  # ── All-in-one ──────────────────────────────────────────────────────────────
+
+  ci:
+    desc: Run everything (lint + format check + tests + helm)
+    cmds:
+      - task: lint
+      - task: fmt-check
+      - task: test
+      - task: helm-lint
+      - task: helm-test

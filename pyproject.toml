@@ -1,0 +1,49 @@
+[project]
+name = "pihole-exporter"
+version = "0.1.0"
+description = "Prometheus exporter for Pi-hole v6"
+authors = [
+    {name = "Cedric DELGEHIER", email = "cedric.delgehier@gmail.com"}
+]
+requires-python = ">=3.14"
+dependencies = [
+    "prometheus-client>=0.21.0",
+    "httpx>=0.28.0",
+    "pydantic-settings>=2.0.0",
+]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+version_provider = "pep621"
+tag_format = "v$version"
+update_changelog_on_bump = true
+version_files = [
+    "pyproject.toml:^version",
+    "pihole_exporter/main.py:^__version__",
+    "Dockerfile:ARG APP_VERSION",
+    "helm/Chart.yaml:^version",
+    "helm/Chart.yaml:^appVersion",
+]
+
+[dependency-groups]
+dev = [
+    "commitizen>=3.0.0",
+    "ruff>=0.13.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-v --cov=pihole_exporter --cov-report=term-missing"
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+fix = true
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]

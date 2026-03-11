@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pihole-exporter.fullname" . }}
+  labels:
+    {{- include "pihole-exporter.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "pihole-exporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pihole-exporter.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: pihole-exporter
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.exporter.port }}
+              protocol: TCP
+          env:
+            - name: PIHOLE_HOST
+              value: {{ .Values.pihole.host | quote }}
+            - name: PIHOLE_PORT
+              value: {{ .Values.pihole.port | quote }}
+            - name: PIHOLE_HTTPS
+              value: {{ .Values.pihole.https | quote }}
+            - name: EXPORTER_PORT
+              value: {{ .Values.exporter.port | quote }}
+            - name: SCRAPE_INTERVAL
+              value: {{ .Values.exporter.scrapeInterval | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.exporter.logLevel | quote }}
+            - name: PIHOLE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.pihole.passwordSecretRef.name }}
+                  key: {{ .Values.pihole.passwordSecretRef.key }}
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

@@ -1,0 +1,82 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+  python: python3.14
+
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.9.1
+    hooks:
+      - id: commitizen
+      - id: commitizen-branch
+        stages: [manual]
+
+  # Astral uv - Python package manager (equivalent to poetry-check and poetry-lock)
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.5.18
+    hooks:
+      # Check if uv.lock is up-to-date with pyproject.toml
+      - id: uv-lock
+
+  # Astral Ruff - Fast Python linter (replaces flake8, isort, etc.)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.0
+    hooks:
+      # Linter
+      - id: ruff
+        args: [--fix]
+      # Formatter
+      - id: ruff-format
+
+  # Helm docs generator
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.14.2
+    hooks:
+      - id: helm-docs
+        # files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
+        args:
+          # Make the tool search for charts only under the `helm` directory
+          - --chart-search-root=helm
+
+  # Local Helm hooks
+  - repo: local
+    hooks:
+      - id: helm-lint
+        name: Helm Lint
+        entry: helm lint helm
+        language: system
+        types: [yaml]
+        pass_filenames: false
+        files: ^helm/
+
+      - id: helm-template
+        name: Helm Template
+        entry: helm template pihole-exporter helm
+        language: system
+        types: [yaml]
+        pass_filenames: false
+        files: ^helm/
+
+      - id: helm-unittest
+        name: Helm Unittest
+        entry: bash -c 'helm unittest helm'
+        language: system
+        types: [yaml]
+        pass_filenames: false
+        files: ^helm/
+
+  # Pre-commit hooks - Standard checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-json
+      - id: detect-private-key
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-executables-have-shebangs
+      - id: check-yaml
+        exclude: ^helm/templates/
+      - id: check-toml
