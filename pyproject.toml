@@ -24,6 +24,7 @@ version_files = [
     "Dockerfile:ARG APP_VERSION",
     "helm/Chart.yaml:^version",
     "helm/Chart.yaml:^appVersion",
+    "helm/values.yaml:tag",
 ]
 
 [dependency-groups]
