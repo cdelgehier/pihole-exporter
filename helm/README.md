@@ -1,6 +1,6 @@
 # pihole-exporter
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.0](https://img.shields.io/badge/AppVersion-0.2.0-informational?style=flat-square)
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.1](https://img.shields.io/badge/AppVersion-0.2.1-informational?style=flat-square)
 
 Prometheus exporter for Pi-hole v6
 
@@ -13,15 +13,15 @@ Prometheus exporter for Pi-hole v6
 | exporter.scrapeInterval | int | `30` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/cdelgehier/pihole-exporter"` |  |
-| image.tag | string | `"0.2.0"` |  |
+| image.tag | string | `"0.2.1"` |  |
 | pihole.host | string | `"pihole-web.pihole.svc.cluster.local"` |  |
 | pihole.https | bool | `false` |  |
 | pihole.passwordSecretRef.key | string | `"password"` |  |
 | pihole.passwordSecretRef.name | string | `"pihole-password"` |  |
 | pihole.port | int | `80` |  |
-| resources.limits.memory | string | `"64Mi"` |  |
+| resources.limits.memory | string | `"128Mi"` |  |
 | resources.requests.cpu | string | `"10m"` |  |
-| resources.requests.memory | string | `"32Mi"` |  |
+| resources.requests.memory | string | `"64Mi"` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.interval | string | `"30s"` |  |
 | serviceMonitor.labels | object | `{}` |  |
