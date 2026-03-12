@@ -58,6 +58,14 @@ class PiholeCollector:
             LOGGER.warning("Failed to fetch version: %s", exc)
             errors += 1
 
+        # Fetch top clients
+        top_clients_data: dict = {}
+        try:
+            top_clients_data = self.client.get_top_clients()
+        except Exception as exc:
+            LOGGER.warning("Failed to fetch top_clients: %s", exc)
+            errors += 1
+
         duration = time.time() - start
         self._scrape_errors += errors
 
@@ -157,6 +165,19 @@ class PiholeCollector:
         yield g_uq
         yield g_uf
         yield g_urt
+
+        # pihole_client_queries_total{ip, name}
+        g_cq = GaugeMetricFamily(
+            "pihole_client_queries_total",
+            "Total DNS queries per client",
+            labels=["ip", "name"],
+        )
+        for client_entry in top_clients_data.get("clients", []):
+            ip = client_entry.get("ip", "")
+            name = client_entry.get("name", ip)
+            count = client_entry.get("count", 0)
+            g_cq.add_metric([ip, name], float(count))
+        yield g_cq
 
         # pihole_version_info{core=}
         core_version = (

@@ -78,3 +78,6 @@ class PiholeClient:
 
     def get_version(self) -> dict:
         return self.get("/api/info/version")
+
+    def get_top_clients(self) -> dict:
+        return self.get("/api/stats/top_clients")
