@@ -1,3 +1,9 @@
+## v0.2.2 (2026-03-12)
+
+### Fix
+
+- **helm**: increase default memory limits to 128Mi (OOMKilled in prod)
+
 ## v0.2.1 (2026-03-11)
 
 ### Fix
