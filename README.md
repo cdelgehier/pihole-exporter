@@ -88,7 +88,7 @@ Use the native OCI source format with `path: .` — do not use the Helm `chart:`
 ```yaml
 - repoURL: oci://ghcr.io/cdelgehier/helm-charts/pihole-exporter
   path: .
-  targetRevision: "0.2.2"
+  targetRevision: "0.3.0"
   helm:
     valuesObject:
       pihole:

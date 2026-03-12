@@ -1,3 +1,9 @@
+## v0.3.0 (2026-03-12)
+
+### Feat
+
+- **collector**: add per-client DNS query metrics
+
 ## v0.2.2 (2026-03-12)
 
 ### Fix
