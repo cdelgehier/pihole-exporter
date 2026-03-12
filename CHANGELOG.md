@@ -1,3 +1,9 @@
+## v0.4.0 (2026-03-12)
+
+### Feat
+
+- add .github/dependabot
+
 ## v0.3.0 (2026-03-12)
 
 ### Feat
