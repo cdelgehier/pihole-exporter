@@ -9,7 +9,7 @@ from pihole_exporter.collector import PiholeCollector
 from pihole_exporter.logger import LOGGER
 from pihole_exporter.settings import SETTINGS
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 
 def run_server(port: int, client: PiholeClient) -> None:

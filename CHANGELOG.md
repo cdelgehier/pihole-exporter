@@ -1,3 +1,9 @@
+## v0.4.1 (2026-03-24)
+
+### Fix
+
+- **client**: use persistent httpx.Client to fix memory leak
+
 ## v0.4.0 (2026-03-12)
 
 ### Feat
