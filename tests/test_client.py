@@ -36,49 +36,49 @@ def test_client_initial_sid_is_none(http_client):
 # --- authenticate ---
 
 
-@patch("httpx.post")
-def test_authenticate_returns_sid(mock_post, http_client):
-    mock_post.return_value = MagicMock(
-        **{"json.return_value": {"session": {"sid": "abc123", "validity": 1800}}}
-    )
-    sid = http_client.authenticate()
+def test_authenticate_returns_sid(http_client):
+    with patch.object(http_client._http, "post") as mock_post:
+        mock_post.return_value = MagicMock(
+            **{"json.return_value": {"session": {"sid": "abc123", "validity": 1800}}}
+        )
+        sid = http_client.authenticate()
     assert sid == "abc123"
     assert http_client._sid == "abc123"
 
 
-@patch("httpx.post")
-def test_authenticate_posts_correct_url_and_payload(mock_post, http_client):
-    mock_post.return_value = MagicMock(
-        **{"json.return_value": {"session": {"sid": "x", "validity": 1800}}}
-    )
-    http_client.authenticate()
-    mock_post.assert_called_once_with(
-        "http://localhost:80/api/auth",
-        json={"password": "secret"},
-        timeout=10,
-    )
+def test_authenticate_posts_correct_url_and_payload(http_client):
+    with patch.object(http_client._http, "post") as mock_post:
+        mock_post.return_value = MagicMock(
+            **{"json.return_value": {"session": {"sid": "x", "validity": 1800}}}
+        )
+        http_client.authenticate()
+        mock_post.assert_called_once_with(
+            "http://localhost:80/api/auth",
+            json={"password": "secret"},
+        )
 
 
-@patch("httpx.post")
-def test_authenticate_sets_expiry_with_safety_margin(mock_post, http_client):
-    mock_post.return_value = MagicMock(
-        **{"json.return_value": {"session": {"sid": "x", "validity": 1800}}}
-    )
-    before = time.time()
-    http_client.authenticate()
-    after = time.time()
+def test_authenticate_sets_expiry_with_safety_margin(http_client):
+    with patch.object(http_client._http, "post") as mock_post:
+        mock_post.return_value = MagicMock(
+            **{"json.return_value": {"session": {"sid": "x", "validity": 1800}}}
+        )
+        before = time.time()
+        http_client.authenticate()
+        after = time.time()
     # expiry = time.time() + 1800 - 60 = time.time() + 1740
     assert before + 1740 <= http_client._sid_expiry <= after + 1740
 
 
-@patch("httpx.post")
-def test_authenticate_raises_on_http_error(mock_post, http_client):
+def test_authenticate_raises_on_http_error(http_client):
     mock_resp = MagicMock()
     mock_resp.raise_for_status.side_effect = httpx.HTTPStatusError(
         "401", request=MagicMock(), response=MagicMock()
     )
-    mock_post.return_value = mock_resp
-    with pytest.raises(httpx.HTTPStatusError):
+    with (
+        patch.object(http_client._http, "post", return_value=mock_resp),
+        pytest.raises(httpx.HTTPStatusError),
+    ):
         http_client.authenticate()
 
 
@@ -116,38 +116,40 @@ def test_ensure_auth_reauthenticates_when_session_expired(http_client):
 # --- get ---
 
 
-@patch("httpx.get")
-def test_get_sends_sid_header(mock_get, http_client):
+def test_get_sends_sid_header(http_client):
     http_client._sid = "mysid"
     http_client._sid_expiry = time.time() + 1000
-    mock_get.return_value = MagicMock(
-        status_code=200, **{"json.return_value": {"ok": True}}
-    )
+    with patch.object(http_client._http, "get") as mock_get:
+        mock_get.return_value = MagicMock(
+            status_code=200, **{"json.return_value": {"ok": True}}
+        )
 
-    result = http_client.get("/api/stats/summary")
+        result = http_client.get("/api/stats/summary")
 
-    assert result == {"ok": True}
-    mock_get.assert_called_once_with(
-        "http://localhost:80/api/stats/summary",
-        headers={"X-FTL-SID": "mysid"},
-        timeout=10,
-    )
+        assert result == {"ok": True}
+        mock_get.assert_called_once_with(
+            "http://localhost:80/api/stats/summary",
+            headers={"X-FTL-SID": "mysid"},
+        )
 
 
-@patch("httpx.get")
-def test_get_retries_on_401_with_new_sid(mock_get, http_client):
+def test_get_retries_on_401_with_new_sid(http_client):
     """On 401, re-authenticates and retries the request with new SID."""
     http_client._sid = "oldsid"
     http_client._sid_expiry = time.time() + 1000
 
     resp_401 = MagicMock(status_code=401)
     resp_ok = MagicMock(status_code=200, **{"json.return_value": {"data": "ok"}})
-    mock_get.side_effect = [resp_401, resp_ok]
 
     def set_new_sid():
         http_client._sid = "newsid"
 
-    with patch.object(http_client, "authenticate", side_effect=set_new_sid):
+    with (
+        patch.object(
+            http_client._http, "get", side_effect=[resp_401, resp_ok]
+        ) as mock_get,
+        patch.object(http_client, "authenticate", side_effect=set_new_sid),
+    ):
         result = http_client.get("/api/stats/summary")
 
     assert result == {"data": "ok"}
@@ -157,20 +159,20 @@ def test_get_retries_on_401_with_new_sid(mock_get, http_client):
     assert second_call_headers["X-FTL-SID"] == "newsid"
 
 
-@patch("httpx.get")
-def test_get_no_retry_on_401_without_password(mock_get, passwordless_client):
+def test_get_no_retry_on_401_without_password(passwordless_client):
     """No re-authentication when no password is configured."""
-    mock_get.return_value = MagicMock(status_code=401)
-    passwordless_client.get("/api/stats/summary")
-    assert mock_get.call_count == 1
+    with patch.object(passwordless_client._http, "get") as mock_get:
+        mock_get.return_value = MagicMock(status_code=401)
+        passwordless_client.get("/api/stats/summary")
+        assert mock_get.call_count == 1
 
 
-@patch("httpx.get")
-def test_get_no_sid_header_without_password(mock_get, passwordless_client):
-    mock_get.return_value = MagicMock(status_code=200, **{"json.return_value": {}})
-    passwordless_client.get("/api/stats/summary")
-    called_headers = mock_get.call_args[1]["headers"]
-    assert "X-FTL-SID" not in called_headers
+def test_get_no_sid_header_without_password(passwordless_client):
+    with patch.object(passwordless_client._http, "get") as mock_get:
+        mock_get.return_value = MagicMock(status_code=200, **{"json.return_value": {}})
+        passwordless_client.get("/api/stats/summary")
+        called_headers = mock_get.call_args[1]["headers"]
+        assert "X-FTL-SID" not in called_headers
 
 
 # --- endpoint shortcuts ---

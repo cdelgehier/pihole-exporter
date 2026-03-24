@@ -16,13 +16,23 @@ class PiholeClient:
         self.password = password
         self._sid: str | None = None
         self._sid_expiry: float = 0.0
+        self._http = httpx.Client(timeout=10)
+
+    def close(self) -> None:
+        """Close the underlying HTTP connection pool."""
+        self._http.close()
+
+    def __enter__(self) -> PiholeClient:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.close()
 
     def authenticate(self) -> str:
         """POST /api/auth → returns the session ID."""
-        resp = httpx.post(
+        resp = self._http.post(
             f"{self.base_url}/api/auth",
             json={"password": self.password},
-            timeout=10,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -48,20 +58,18 @@ class PiholeClient:
         if self._sid:
             headers["X-FTL-SID"] = self._sid
 
-        resp = httpx.get(
+        resp = self._http.get(
             f"{self.base_url}{endpoint}",
             headers=headers,
-            timeout=10,
         )
 
         if resp.status_code == 401 and self.password:
             LOGGER.debug("Session expired, re-authenticating...")
             self.authenticate()
             headers["X-FTL-SID"] = self._sid
-            resp = httpx.get(
+            resp = self._http.get(
                 f"{self.base_url}{endpoint}",
                 headers=headers,
-                timeout=10,
             )
 
         resp.raise_for_status()
