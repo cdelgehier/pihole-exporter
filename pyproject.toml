@@ -7,9 +7,9 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "prometheus-client>=0.21.0",
+    "prometheus-client>=0.25.0",
     "httpx>=0.28.0",
-    "pydantic-settings>=2.0.0",
+    "pydantic-settings>=2.14.0",
 ]
 
 [tool.commitizen]
@@ -30,10 +30,10 @@ version_files = [
 
 [dependency-groups]
 dev = [
-    "commitizen>=3.0.0",
-    "ruff>=0.13.0",
-    "pytest>=8.0.0",
-    "pytest-cov>=6.0.0",
+    "commitizen>=4.13.10",
+    "ruff>=0.15.11",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
 ]
 
 [tool.pytest.ini_options]
